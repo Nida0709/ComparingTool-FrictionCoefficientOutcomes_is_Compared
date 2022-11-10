@@ -39,7 +39,6 @@ def export_DB(dataPath, DB, header, save_Path):
   return frag
 
 
-
 def function1(fileList, method_name, delta, save_Path):    #delta=平均する微分の範囲
   import pandas
   import os
@@ -367,6 +366,39 @@ def function6(fileList, method_name, save_Path):
       print("seved [" + fileName + "]")
     else:
       print("error02\n出力失敗しました。")
+    
+
+def function7(fileList=None, method_name=None, save_Path=None, number_coef=None):
+  import pandas
+  for count_fL in range(len(fileList)):     #count_fL = count_fileList
+    print(str(count_fL+1) + "/" + str(len(fileList)))
+    dataPath = fileList[count_fL]
+    DF = pandas.read_excel(dataPath, sheet_name = "Sheet1")
+    fileName, Method, Material, Weight, SlidingSpeed, number = sprit_fileList(dataPath)
+
+    #DF→List translate
+    SlidingTime = []
+    FrictionCoefficient = []
+    for i in range(len(DF)-19):
+      SlidingTime.append(DF.values[i+19][0])
+      FrictionCoefficient.append(DF.values[i+19][2])
+
+    differential = pandas.DataFrame(data=SlidingTime, columns=['SlidingTime'])
+    temp_differential_value = []
+    temp_differential_value.append(0)
+    for i in range(1, len(SlidingTime)):
+      temp_differential_value.append((FrictionCoefficient[i]-FrictionCoefficient[i-1])/(SlidingTime[i]-SlidingTime[i-1]))
+    differential['1_deriv'] = temp_differential_value
+    for n in range(2, number_coef+1):
+      temp_differential_value = []
+      temp_differential_value.append(0)
+      for i in range(1, len(SlidingTime)):
+        temp_differential_value.append((differential.values[i][n-1]-differential.values[i-1][n-1])/(SlidingTime[i]-SlidingTime[i-1]))
+      differential[str(n)+'_deriv'] = temp_differential_value
+    differential.to_excel(save_Path + os.sep + os.path.splitext(os.path.basename(dataPath))[0] + '.xlsx', \
+      index=False, header=list(differential.columns))
+    print("seved [" + fileName + "]")
+
 
 
 
@@ -384,34 +416,13 @@ from tkinter import messagebox
 
 method_index = ["20秒間の平均傾き全表示","20秒間の平均レンジ","20秒間の平均標準偏差","xx秒間の平均レンジ",\
                 "xx秒間の平均標準偏差","相関係数全表示_摩擦係数近似","摩擦係数近似による安定時間演算(相関係数0.80)", \
-                "摩擦係数近似による安定時間演算(相関係数0.xx)", "摩擦係数近似による安定時間演算(最大相関係数)"]
+                "摩擦係数近似による安定時間演算(相関係数0.xx)", "摩擦係数近似による安定時間演算(最大相関係数)", "摩擦係数微分(微分回数xx)"]
 
 #処理種別決定&処理内容確認
 print("計算手法を入力してください。")
 for i in range(len(method_index)):
   print(str(i) + ":" + method_index[i])
 frag_method = int(input(">>"))
-#xx秒系の時間範囲入力
-if (frag_method == 3) or (frag_method == 4):
-  rangeTime = int(input("時間範囲を入力してください。[sec]\n>>"))
-  method_index[frag_method] = str(rangeTime) + method_index[frag_method][2: ]      #methodの変更
-if frag_method == 7:
-  CorrelationCoefficient = float(input("相関係数を入力してください。\n>>"))
-  method_index[frag_method] = method_index[frag_method][ : 20] + str(float(CorrelationCoefficient)) + ")"
-for i in range(5):
-  frag_confirm = input(str(method_index[frag_method]) + "を実行します。\n処理を続行するならばyes,キャンセルするならばnoを入力してください。\n>>")
-  if frag_confirm == "yes":
-    print("処理開始を確認")
-    break
-  elif frag_confirm == "no":
-    print("処理失敗を確認")
-    sys.exit()
-  else:
-    print("error01")
-    print("再度入力してください。")
-    if i == 4:
-      print("上限を超えました。")
-      sys.exit()
 method_name = method_index[frag_method]
 
 #fileList取得
@@ -441,11 +452,15 @@ elif frag_method == 2:
 
 #xx秒間の平均レンジ
 elif frag_method == 3:
+  rangeTime = int(input("時間範囲を入力してください。[sec]\n>>"))
+  method_name = str(rangeTime) + method_name[2: ]
   delta = rangeTime *10
   function2(fileList, method_name, delta, save_Path)
 
 #xx秒間の平均標準偏差
 elif frag_method == 4:
+  rangeTime = int(input("時間範囲を入力してください。[sec]\n>>"))
+  method_name = str(rangeTime) + method_name[2: ]
   delta = rangeTime *10
   function3(fileList, method_name, delta, save_Path)
 
@@ -460,11 +475,19 @@ elif frag_method == 6:
 
 #摩擦係数近似による安定時間演算(相関係数0.xx)
 elif frag_method == 7:
+  CorrelationCoefficient = float(input("相関係数を入力してください。\n>>"))
+  method_name = method_name[ : 20] + str(float(CorrelationCoefficient)) + ')'
   function5(fileList, method_name, CorrelationCoefficient, save_Path)
 
 #摩擦係数近似による安定時間演算(相関係数0.xx)
 elif frag_method == 8:
   function6(fileList, method_name, save_Path)
+
+#摩擦係数微分・二回微分
+elif frag_method == 9:
+  number_coef = int(input('微分回数を入力してください。\n>>'))
+  method_name = method_name[:-3] + str(number_coef) + ')'
+  function7(fileList=fileList, method_name=method_name, save_Path=save_Path, number_coef=number_coef)
 
 else:
   print("error04\nモードがありません。システムを終了します。")
@@ -475,3 +498,5 @@ print("All Process is Done\nstop Running\nSee you my Boss")
 
 #ver1.0.0　基本設計作成
 #ver1.0.1　変数名変更&ESTコード見直し
+#ver1.1.0　微分機能追加
+#ver1.1.1　微小な修正
