@@ -383,7 +383,7 @@ def function7(fileList=None, method_name=None, save_Path=None, number_coef=None)
       SlidingTime.append(DF.values[i+19][0])
       FrictionCoefficient.append(DF.values[i+19][2])
 
-    differential = pandas.DataFrame(data=SlidingTime, columns=['SlidingTime'])
+    differential = pandas.DataFrame(data=[SlidingTime, FrictionCoefficient], columns=['SlidingTime', 'FrictionCoefficient'])
     temp_differential_value = []
     temp_differential_value.append(0)
     for i in range(1, len(SlidingTime)):
