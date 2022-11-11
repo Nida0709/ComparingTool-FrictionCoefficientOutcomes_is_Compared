@@ -395,7 +395,10 @@ def function7(fileList=None, method_name=None, save_Path=None, number_coef=None)
       temp_differential_value = []
       temp_differential_value.append(0)
       for i in range(1, len(SlidingTime)):
-        temp_differential_value.append((differential.values[i][n-1]-differential.values[i-1][n-1])/(SlidingTime[i]-SlidingTime[i-1]))
+        if differential.values[i-1][n] == 0 or differential.values[i][n] == 0:
+          temp_differential_value.append(0)
+        else:
+          temp_differential_value.append((differential.values[i][n]-differential.values[i-1][n])/(SlidingTime[i]-SlidingTime[i-1]))
       differential[str(n)+'_deriv'] = temp_differential_value
     differential.to_excel(save_Path + os.sep + os.path.splitext(os.path.basename(dataPath))[0] + '.xlsx', \
       index=False, header=list(differential.columns))
@@ -505,3 +508,4 @@ print("All Process is Done\nstop Running\nSee you my Boss")
 #ver1.1.2　FrictionCoefficient追加
 #ver1.1.3　微小な修正
 #ver1.1.4　微小な修正
+#ver1.1.5　行番号が誤っていたため修正
