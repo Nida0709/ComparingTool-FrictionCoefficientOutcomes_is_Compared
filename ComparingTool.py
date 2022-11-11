@@ -370,6 +370,7 @@ def function6(fileList, method_name, save_Path):
 
 def function7(fileList=None, method_name=None, save_Path=None, number_coef=None):
   import pandas
+  import numpy
   for count_fL in range(len(fileList)):     #count_fL = count_fileList
     print(str(count_fL+1) + "/" + str(len(fileList)))
     dataPath = fileList[count_fL]
@@ -383,7 +384,7 @@ def function7(fileList=None, method_name=None, save_Path=None, number_coef=None)
       SlidingTime.append(DF.values[i+19][0])
       FrictionCoefficient.append(DF.values[i+19][2])
 
-    differential = pandas.DataFrame(data=[SlidingTime, FrictionCoefficient], columns=['SlidingTime', 'FrictionCoefficient'])
+    differential = pandas.DataFrame(data=numpy.array([SlidingTime, FrictionCoefficient]), columns=['SlidingTime', 'FrictionCoefficient'])
     temp_differential_value = []
     temp_differential_value.append(0)
     for i in range(1, len(SlidingTime)):
@@ -500,3 +501,5 @@ print("All Process is Done\nstop Running\nSee you my Boss")
 #ver1.0.1　変数名変更&ESTコード見直し
 #ver1.1.0　微分機能追加
 #ver1.1.1　微小な修正
+#ver1.1.2　FrictionCoefficient追加
+#ver1.1.3　微小な修正
