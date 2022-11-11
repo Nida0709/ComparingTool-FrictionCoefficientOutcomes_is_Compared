@@ -388,8 +388,9 @@ def function7(fileList=None, method_name=None, save_Path=None, number_coef=None)
     differential['FrictionCoefficient'] = FrictionCoefficient
     temp_differential_value = []
     temp_differential_value.append(0)
-    for i in range(1, len(SlidingTime)):
+    for i in range(1, len(SlidingTime)-1):
       temp_differential_value.append((FrictionCoefficient[i]-FrictionCoefficient[i-1])/(SlidingTime[i]-SlidingTime[i-1]))
+    temp_differential_value.append(0)
     differential['1_deriv'] = temp_differential_value
     for n in range(2, number_coef+1):
       temp_differential_value = []
@@ -509,3 +510,4 @@ print("All Process is Done\nstop Running\nSee you my Boss")
 #ver1.1.3　微小な修正
 #ver1.1.4　微小な修正
 #ver1.1.5　行番号が誤っていたため修正
+#ver1.1.6　微小な修正
